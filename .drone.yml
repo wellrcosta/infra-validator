@@ -15,7 +15,11 @@ steps:
       SONAR_HOST_URL:
         from_secret: SONAR_HOST_URL
     commands:
-      - sonar-scanner
+      - sonar-scanner \
+        -Dsonar.projectKey=${DRONE_REPO_NAME} \
+        -Dsonar.sources=. \
+        -Dsonar.host.url=${SONAR_HOST_URL} \
+        -Dsonar.login=${SONAR_TOKEN}
 
   - name: deploy
     image: docker
