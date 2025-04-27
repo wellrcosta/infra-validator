@@ -1,7 +1,11 @@
-kind: template
-name: wellrcosta/nodejs-template.yaml
+kind: pipeline
 type: docker
+name: default
 
-settings:
-  repo_name: ${DRONE_REPO_NAME}
-  port: ${PORT}
+steps:
+  - name: deploy
+    template:
+      name: nodejs-template
+      vars:
+        port: ${PORT}
+        repo_name: ${DRONE_REPO_NAME}
