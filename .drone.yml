@@ -1,33 +1,7 @@
-kind: pipeline
+kind: template
+name: nodejs-template
 type: docker
-name: default
 
-trigger:
-  branch:
-    - main
-
-steps:
-  - name: sonar-analysis
-    image: sonarsource/sonar-scanner-cli
-    environment:
-      SONAR_TOKEN:
-        from_secret: SONAR_TOKEN
-      SONAR_HOST_URL:
-        from_secret: SONAR_HOST_URL
-    commands:
-      - sonar-scanner -Dsonar.projectKey=${DRONE_REPO_NAME} -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
-
-  - name: deploy
-    image: docker
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
-    commands:
-      - docker rm -f app-${DRONE_REPO_NAME} || true
-      - docker build -t app-${DRONE_REPO_NAME}:latest .
-      - docker run -d --restart unless-stopped --network apps-network -p 5000:5000 --name app-${DRONE_REPO_NAME} app-${DRONE_REPO_NAME}
-
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
+settings:
+  repo_name: ${DRONE_REPO_NAME}
+  port: ${PORT}
