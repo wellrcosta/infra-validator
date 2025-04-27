@@ -167,7 +167,6 @@ curl -X GET http://localhost:4000/metrics
 
 | Variable Name | Description |
 |---------------|-------------|
-| APP_PORT | Application listening port (default: 4000) |
 | REDIS_HOST | Redis server IP address |
 | REDIS_PORT | Redis server port |
 | MONGO_URI | MongoDB connection URI |
@@ -191,9 +190,3 @@ curl -X GET http://localhost:4000/metrics
 # License
 
 MIT License
-
----
-
-# Author
-
-Infra Validator Project - 2025
