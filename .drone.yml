@@ -2,7 +2,38 @@ kind: pipeline
 type: docker
 name: default
 
+trigger:
+  branch:
+    - main
+
 steps:
-  - name: pipeline
-    template:
-      name: nodejs-template
+  - name: build-node
+    image: node:20
+    commands:
+      - npm install
+      - npm run build
+
+  - name: sonar-analysis
+    image: sonarsource/sonar-scanner-cli
+    environment:
+      SONAR_TOKEN:
+        from_secret: SONAR_TOKEN
+      SONAR_HOST_URL:
+        from_secret: SONAR_HOST_URL
+    commands:
+      - sonar-scanner
+
+  - name: deploy
+    image: docker
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    commands:
+      - docker rm -f app-${DRONE_REPO_NAME} || true
+      - docker build -t app-${DRONE_REPO_NAME}:latest .
+      - docker run -d --restart unless-stopped --network apps-network -p 5000:5000 --name app-${DRONE_REPO_NAME} app-${DRONE_REPO_NAME}
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
