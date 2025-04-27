@@ -2,10 +2,40 @@ kind: pipeline
 type: docker
 name: default
 
+# Aciona apenas em push na branch "main"
+trigger:
+  event:
+    - push
+  branch:
+    - main
+
 steps:
+  - name: build
+    image: docker:latest # Usa imagem Docker CLI para construir a imagem
+    volumes:
+      - name: docker_sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t app-${DRONE_REPO_NAME} . # Constrói a imagem usando Dockerfile no diretório atual
+
   - name: deploy
-    template:
-      name: nodejs-template
-      vars:
-        port: ${PORT}
-        repo_name: ${DRONE_REPO_NAME}
+    image: docker:latest # Usa imagem Docker CLI para executar comandos de deploy
+    volumes:
+      - name: docker_sock
+        path: /var/run/docker.sock
+    environment:
+      PORT:
+        from_secret: PORT # Injeta o valor do secret PORT na variável de ambiente $PORT
+    commands:
+      - docker stop app-${DRONE_REPO_NAME} || true # Para o container antigo se estiver em execução (ignora erro se não existir)
+      - docker rm app-${DRONE_REPO_NAME} || true # Remove o container antigo (ignora erro se não existir)
+      - docker run -d --network apps-network \
+        --name app-${DRONE_REPO_NAME} \
+        -p $PORT:$PORT \
+        --restart unless-stopped \
+        app-${DRONE_REPO_NAME} # Inicia o novo container com nome e porta configurados
+
+volumes:
+  - name: docker_sock
+    host:
+      path: /var/run/docker.sock # Monta o socket Docker do host dentro dos steps, permitindo controle do Docker host
