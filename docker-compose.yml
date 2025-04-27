@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  infra-validator:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - PG_HOST=${PG_HOST}
+      - PG_PORT=${PG_PORT}
+      - PG_DATABASE=${PG_DATABASE}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - LOKI_HOST=${LOKI_HOST}
+    env_file:
+      - .env

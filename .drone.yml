@@ -1,0 +1,7 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: deploy
+    template: deploy/build
