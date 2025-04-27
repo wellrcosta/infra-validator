@@ -7,12 +7,6 @@ trigger:
     - main
 
 steps:
-  - name: build-node
-    image: node:20
-    commands:
-      - npm install
-      - npm run build
-
   - name: sonar-analysis
     image: sonarsource/sonar-scanner-cli
     environment:
