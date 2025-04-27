@@ -1,5 +1,5 @@
 kind: template
-name: nodejs-template
+name: wellrcosta/nodejs-template
 type: docker
 
 settings:
